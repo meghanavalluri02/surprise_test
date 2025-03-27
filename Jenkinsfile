@@ -6,26 +6,34 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/meghanavalluri02/surprise_test.git'
             }
         }
-        stage('Setup') {
+        stage('Install Dependencies') {
             steps {
-                sh 'python3 -m venv venv'
-                sh 'source venv/bin/activate'
-                sh 'pip install -r requirements.txt'
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
-        stage('Test') {
+        stage('Run Tests') {
             steps {
-                sh 'source venv/bin/activate && pytest tests/'
+                sh '''
+                source venv/bin/activate
+                pytest test_app.py --disable-warnings
+                '''
             }
         }
-        stage('Build') {
+        stage('Build & Archive') {
             steps {
-                sh 'python setup.py bdist_wheel'
-            }
-        }
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'dist/*.whl', fingerprint: true
+                sh '''
+                mkdir -p build
+                cp app.py build/
+                cp requirements.txt build/
+                cp setup.py build/
+                tar -czf build.tar.gz build
+                '''
+                archiveArtifacts artifacts: 'build.tar.gz', fingerprint: true
             }
         }
     }
