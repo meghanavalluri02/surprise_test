@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/username/python-app.git'
+                git 'https://github.com/meghanavalluri02/surprise_test.git'
             }
         }
         stage('Setup') {
